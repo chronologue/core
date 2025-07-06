@@ -1,0 +1,25 @@
+{
+  "name": "chronologue/core",
+  "description": "Core module for laravel project.",
+  "keywords": ["laravel", "package"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Darmayasa",
+      "email": "darmayasa@proton.me"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "laravel/framework": "^12.19",
+    "inertiajs/inertia-laravel": "^2.0",
+    "staudenmeir/laravel-adjacency-list": "^1.25"
+  },
+  "autoload": {
+    "psr-4": {
+      "Chronologue\\Core\\": "src/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
