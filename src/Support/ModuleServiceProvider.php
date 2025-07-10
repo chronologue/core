@@ -14,9 +14,7 @@ abstract class ModuleServiceProvider extends ServiceProvider
     public function __construct($app)
     {
         parent::__construct($app);
-
-        $class = new ReflectionClass($this);
-        $this->directory = dirname($class->getFileName());
+        $this->initDirectory();
     }
 
     public function register(): void
@@ -49,7 +47,7 @@ abstract class ModuleServiceProvider extends ServiceProvider
     protected function bootMigrations(): void
     {
         if ($this->app->runningInConsole()) {
-            $directory = str_replace('/', DIRECTORY_SEPARATOR, $this->directory . '/Database/Migrations');
+            $directory = str_replace('/', DIRECTORY_SEPARATOR, $this->getDirectory() . '/Database/Migrations');
             if (is_dir($directory)) {
                 $this->loadMigrationsFrom($directory);
             }
@@ -60,12 +58,23 @@ abstract class ModuleServiceProvider extends ServiceProvider
     {
         if (!($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             foreach ((array)config('module.routes') as $key => $value) {
-                if (file_exists($route = str_replace('/', DIRECTORY_SEPARATOR, $this->directory . '/' . $value['name']))) {
+                if (file_exists($route = str_replace('/', DIRECTORY_SEPARATOR, $this->getDirectory() . '/' . $value['name']))) {
                     Route::middleware($key)
                         ->prefix($value['prefix'])
                         ->group($route);
                 }
             }
         }
+    }
+
+    protected function initDirectory(): void
+    {
+        $class = new ReflectionClass($this);
+        $this->directory = dirname($class->getFileName());
+    }
+
+    protected function getDirectory(): string
+    {
+        return $this->directory;
     }
 }
