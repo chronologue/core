@@ -7,6 +7,7 @@ use Chronologue\Core\Support\Controller;
 use Chronologue\Core\Support\ControllerInvoker;
 use Chronologue\Core\Support\ModuleServiceProvider;
 use Chronologue\Core\Support\Paginator;
+use Chronologue\Core\Support\QueryRequest;
 use Chronologue\Core\Support\Service;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Schema\Blueprint;
@@ -26,6 +27,11 @@ class ServiceProvider extends ModuleServiceProvider
         $this->resolvingService();
     }
 
+    public function boot(): void
+    {
+        $this->bootQueryRequest();
+    }
+
     protected function registerControllerDispatcher(): void
     {
         $this->app->singleton(ControllerDispatcher::class, function ($app) {
@@ -41,6 +47,14 @@ class ServiceProvider extends ModuleServiceProvider
     protected function registerBlueprint(): void
     {
         $this->app->bind(Blueprint::class, Prototype::class);
+    }
+
+    protected function bootQueryRequest(): void
+    {
+        $this->app->resolving(QueryRequest::class, function ($request, $app) {
+            $request = QueryRequest::createFrom($app['request'], $request);
+            $request->setContainer($app);
+        });
     }
 
     protected function resolvingController(): void
