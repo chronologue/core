@@ -6,12 +6,15 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResolvesRouteDependencies;
+use Illuminate\Support\Traits\Tappable;
 
 abstract class Controller
 {
     use ResolvesRouteDependencies;
+    use Tappable;
 
     protected Redirector $redirector;
     protected ResponseFactory $response;
@@ -44,10 +47,11 @@ abstract class Controller
         return $this->url;
     }
 
-    protected function builder(): ResponseBuilder
+    protected function builder(?Request $request = null): ResponseBuilder
     {
-        return tap($this->builder, function (ResponseBuilder $builder) {
+        return tap($this->builder, function (ResponseBuilder $builder) use ($request) {
             $builder->initialize();
+            $builder->request($request);
         });
     }
 }
