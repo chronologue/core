@@ -9,12 +9,10 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResolvesRouteDependencies;
-use Illuminate\Support\Traits\Tappable;
 
 abstract class Controller
 {
     use ResolvesRouteDependencies;
-    use Tappable;
 
     protected Redirector $redirector;
     protected ResponseFactory $response;

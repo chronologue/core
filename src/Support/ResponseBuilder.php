@@ -5,10 +5,13 @@ namespace Chronologue\Core\Support;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Tappable;
 use Inertia\ResponseFactory;
 
 class ResponseBuilder
 {
+    use Tappable;
+
     private ResponseFactory $factory;
     private ?Request $request;
     private string $component;
