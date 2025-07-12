@@ -52,7 +52,7 @@ class ResponseBuilder
 
     public function breadcrumb(string|array|callable $title, ?string $url = null): static
     {
-        if (is_string($title)) {
+        if (is_string($title) || is_callable($title)) {
             $this->breadcrumb[] = [$title, ($url ?: $this->request?->url()) ?: '/'];
         } else {
             $this->breadcrumb[] = $title;
@@ -109,7 +109,11 @@ class ResponseBuilder
     protected function resolveBreadcrumb(): array
     {
         $breadcrumb = [];
-        foreach ($this->breadcrumb as [$key, $value]) {
+        foreach ($this->breadcrumb as $item) {
+            if (empty($item)) {
+                continue;
+            }
+            [$key, $value] = count($item) > 1 ? $item : [$item[0], null];
             $breadcrumb[] = [is_callable($key) ? $key() : $key, $value];
         }
         return $breadcrumb;
