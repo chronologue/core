@@ -50,7 +50,7 @@ class ResponseBuilder
         return $this;
     }
 
-    public function breadcrumb(string|array $title, ?string $url = null): static
+    public function breadcrumb(string|array|callable $title, ?string $url = null): static
     {
         if (is_string($title)) {
             $this->breadcrumb[] = [$title, ($url ?: $this->request?->url()) ?: '/'];
@@ -99,14 +99,28 @@ class ResponseBuilder
         }
 
         $this->factory->share('routing.group', fn() => $this->group);
-        $this->factory->share('routing.breadcrumb', fn() => $this->breadcrumb);
+        $this->factory->share('routing.breadcrumb', fn() => $this->resolveBreadcrumb());
         $this->factory->share('routing.tags', fn() => $this->tags);
-        $this->factory->share('routing.title', function () {
-            return (!$this->title && $this->breadcrumb)
-                ? last($this->breadcrumb)[0]
-                : $this->title;
-        });
+        $this->factory->share('routing.title', fn() => $this->resolveTitle());
 
         return $this->factory->render($this->component, $this->data);
+    }
+
+    protected function resolveBreadcrumb(): array
+    {
+        $breadcrumb = [];
+        foreach ($this->breadcrumb as [$key, $value]) {
+            $breadcrumb[] = [is_callable($key) ? $key() : $key, $value];
+        }
+        return $breadcrumb;
+    }
+
+    protected function resolveTitle(): ?string
+    {
+        if (!$this->title && $this->breadcrumb) {
+            $title = last($this->breadcrumb)[0];
+            return is_callable($title) ? $title() : $title;
+        }
+        return $this->title;
     }
 }
