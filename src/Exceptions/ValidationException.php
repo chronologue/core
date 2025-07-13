@@ -7,9 +7,9 @@ use Illuminate\Validation\ValidationException as LaravelValidationException;
 
 class ValidationException extends LaravelValidationException implements ShouldntReport
 {
-    public static function throw(string $message)
+    public static function of(string $message): static
     {
-        throw static::withMessages([
+        return static::withMessages([
             'message' => $message,
         ]);
     }
