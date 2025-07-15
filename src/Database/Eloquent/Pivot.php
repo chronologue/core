@@ -3,9 +3,10 @@
 namespace Chronologue\Core\Database\Eloquent;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Pivot as BasePivot;
 
+#[UseEloquentBuilder(Builder::class)]
 abstract class Pivot extends BasePivot
 {
     public static $snakeAttributes = false;
@@ -15,11 +16,6 @@ abstract class Pivot extends BasePivot
     protected $perPage = 10;
 
     private array $defaultHidden = ['created_at', 'updated_at', 'deleted_at'];
-
-    public function newEloquentBuilder($query): EloquentBuilder
-    {
-        return new Builder($query);
-    }
 
     public function getHidden(): array
     {

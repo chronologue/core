@@ -2,15 +2,11 @@
 
 namespace Chronologue\Core\Database\Eloquent;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
+#[UseEloquentBuilder(AdjacencyListBuilder::class)]
 abstract class AdjacencyListModel extends Model
 {
     use HasRecursiveRelationships;
-
-    public function newEloquentBuilder($query): EloquentBuilder
-    {
-        return new AdjacencyListBuilder($query);
-    }
 }

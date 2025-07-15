@@ -3,11 +3,12 @@
 namespace Chronologue\Core\Database\Eloquent;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[UseEloquentBuilder(Builder::class)]
 abstract class Model extends EloquentModel
 {
     use SoftDeletes, HasFactory;
@@ -17,11 +18,6 @@ abstract class Model extends EloquentModel
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
     protected $perPage = 10;
-
-    public function newEloquentBuilder($query): EloquentBuilder
-    {
-        return new Builder($query);
-    }
 
     public function getHidden(): array
     {

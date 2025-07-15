@@ -56,6 +56,8 @@ abstract class ModuleServiceProvider extends ServiceProvider
 
     protected function bootRoutes(): void
     {
+        $this->bootRoutePatterns();
+
         if (!($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
             foreach ((array)config('module.routes') as $key => $value) {
                 if (file_exists($route = str_replace('/', DIRECTORY_SEPARATOR, $this->getDirectory() . '/' . $value['name']))) {
@@ -65,6 +67,11 @@ abstract class ModuleServiceProvider extends ServiceProvider
                 }
             }
         }
+    }
+
+    protected function bootRoutePatterns(): void
+    {
+        //
     }
 
     protected function initDirectory(): void
