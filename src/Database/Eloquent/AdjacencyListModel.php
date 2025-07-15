@@ -2,11 +2,22 @@
 
 namespace Chronologue\Core\Database\Eloquent;
 
-use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
-#[UseEloquentBuilder(AdjacencyListBuilder::class)]
 abstract class AdjacencyListModel extends Model
 {
     use HasRecursiveRelationships;
+
+    public function newEloquentBuilder($query): AdjacencyListBuilder
+    {
+        $builderClass = $this->resolveCustomBuilderClass();
+
+        if ($builderClass && is_subclass_of($builderClass, AdjacencyListBuilder::class)) {
+            return new $builderClass($query);
+        }
+
+        return new AdjacencyListBuilder($query);
+    }
+
+
 }
