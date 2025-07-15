@@ -55,19 +55,21 @@ class QueryRequest extends Request implements ValidatesWhenResolved
         );
     }
 
+    protected function builtInRules(): array
+    {
+        return [
+            'per_page' => ['required', 'integer', 'min:10'],
+        ];
+    }
+
     /**
      * @throws BindingResolutionException
      */
     protected function getValidatorInstance(): Validator
     {
         $factory = $this->container->make(Factory::class);
-        $validator = $factory->make($this->query(), $this->rules())->stopOnFirstFailure(false);
-
-        $validator->after(function (Validator $validator) {
-            if (!in_array($this->query('per_page'), [10, 25, 50, 100])) {
-                $validator->errors()->add('per_page', 'Invalid per page count.');
-            }
-        });
+        $validator = $factory->make($this->query(), array_merge($this->builtInRules(), $this->rules()))
+            ->stopOnFirstFailure(false);
 
         if (!empty($after = $this->after())) {
             $validator->after($after);
