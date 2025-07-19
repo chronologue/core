@@ -3,7 +3,7 @@
 namespace Chronologue\Core\Support;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ abstract class Controller
     /**
      * @throws BindingResolutionException
      */
-    public function boot(Application $app): void
+    public function boot(Container $app): void
     {
         $this->redirector = $app->make(Redirector::class);
         $this->response = $app->make(ResponseFactory::class);

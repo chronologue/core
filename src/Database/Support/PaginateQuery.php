@@ -2,28 +2,27 @@
 
 namespace Chronologue\Core\Database\Support;
 
-use Chronologue\Core\Support\Traits\ResolvesPageCount;
+use Chronologue\Core\Contracts\SearchParams;
 use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 
 class PaginateQuery
 {
-    use ResolvesPageCount;
-
-    private array|Arrayable $params;
+    private int|SearchParams $size;
     private ?Closure $callback;
 
-    public function __construct(array|Arrayable $params = [], ?Closure $callback = null)
+    public function __construct(int|SearchParams $size = 10, ?Closure $callback = null)
     {
-        $this->params = $params;
+        $this->size = $size;
         $this->callback = $callback;
     }
 
     public function __invoke(Builder $builder): LengthAwarePaginator
     {
-        $paginator = $builder->paginate($this->resolvePageCount($this->params));
+        $paginator = $builder->paginate(
+            $this->size instanceof SearchParams ? $this->size->getPageSize() : $this->size
+        );
 
         if ($this->callback) {
             call_user_func($this->callback, $paginator->getCollection());

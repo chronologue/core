@@ -2,18 +2,15 @@
 
 namespace Chronologue\Core\Database\Support;
 
-use Chronologue\Core\Support\Traits\ResolvesPageCount;
 use Illuminate\Database\Eloquent\Builder;
 
 class LikeSearch
 {
-    use ResolvesPageCount;
-
     private string $column;
-    private string $search;
+    private ?string $search;
     private string $boolean;
 
-    public function __construct(string $column, string $search, string $boolean = 'and')
+    public function __construct(string $column, ?string $search, string $boolean = 'and')
     {
         $this->column = $column;
         $this->search = $search;

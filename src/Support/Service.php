@@ -4,8 +4,8 @@ namespace Chronologue\Core\Support;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Foundation\Application;
 
 abstract class Service
 {
@@ -15,7 +15,7 @@ abstract class Service
     /**
      * @throws BindingResolutionException
      */
-    public function boot(Application $app): void
+    public function boot(Container $app): void
     {
         $this->event = $app->make(Dispatcher::class);
         $this->cache = $app->make(Repository::class);

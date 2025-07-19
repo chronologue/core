@@ -2,6 +2,7 @@
 
 namespace Chronologue\Core\Support;
 
+use Chronologue\Core\Contracts\SearchParams;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory;
@@ -9,7 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 
-class QueryRequest extends Request implements ValidatesWhenResolved
+class QueryRequest extends Request implements ValidatesWhenResolved, SearchParams
 {
     protected Container $container;
 
@@ -53,6 +54,21 @@ class QueryRequest extends Request implements ValidatesWhenResolved
                 ->forget($instance->errors()->keys())
                 ->all()
         );
+    }
+
+    public function getSearchParams($key = null, $default = null): array|string|null
+    {
+        return $this->query($key, $default);
+    }
+
+    public function getSearchQuery(): ?string
+    {
+        return $this->query('search');
+    }
+
+    public function getPageSize(): int
+    {
+        return $this->query('per_page', 10);
     }
 
     protected function builtInRules(): array

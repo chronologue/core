@@ -71,7 +71,14 @@ abstract class ModuleServiceProvider extends ServiceProvider
 
     protected function bootRoutePatterns(): void
     {
-        //
+        if ($patterns = $this->routePatterns()) {
+            Route::patterns($patterns);
+        }
+    }
+
+    protected function routePatterns(): array
+    {
+        return [];
     }
 
     protected function initDirectory(): void

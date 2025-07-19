@@ -18,6 +18,4 @@ abstract class AdjacencyListModel extends Model
 
         return new AdjacencyListBuilder($query);
     }
-
-
 }

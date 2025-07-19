@@ -7,5 +7,5 @@ use Illuminate\Contracts\Debug\ShouldntReport;
 
 class AccessDeniedException extends AuthorizationException implements ShouldntReport
 {
-    
+
 }
