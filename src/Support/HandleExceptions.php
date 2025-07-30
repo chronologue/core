@@ -33,8 +33,10 @@ class HandleExceptions
                 ]);
         }
 
-        if ($response->getStatusCode() === 302 && in_array($request->method(), ['PUT', 'PATCH', 'DELETE'])) {
-            $response->setStatusCode(303);
+        if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+            if ($response->getStatusCode() === 302 && $request->method() !== 'POST') {
+                $response->setStatusCode(303);
+            }
             if ((!$request->hasSession() || !$request->session()->has('errors')) &&
                 $response instanceof RedirectResponse) {
                 $response->withErrors([
