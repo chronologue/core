@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\ResolvesRouteDependencies;
@@ -18,6 +19,7 @@ abstract class Controller
     protected ResponseFactory $response;
     protected UrlGenerator $url;
     protected ResponseBuilder $builder;
+    protected ConnectionInterface $connection;
 
     /**
      * @throws BindingResolutionException
@@ -28,6 +30,7 @@ abstract class Controller
         $this->response = $app->make(ResponseFactory::class);
         $this->url = $app->make(UrlGenerator::class);
         $this->builder = $app->make(ResponseBuilder::class);
+        $this->connection = $app->make(ConnectionInterface::class);
     }
 
     protected function redirector(): Redirector
@@ -43,6 +46,11 @@ abstract class Controller
     protected function url(): UrlGenerator
     {
         return $this->url;
+    }
+
+    protected function connection(): ConnectionInterface
+    {
+        return $this->connection;
     }
 
     protected function builder(?Request $request = null): ResponseBuilder

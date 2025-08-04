@@ -1,6 +1,6 @@
 <?php
 
-namespace Chronologue\Core\Database\Traits;
+namespace Chronologue\Core\Database\Eloquent;
 
 trait HasSearchQuery
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Chronologue\Core\Database\Eloquent\Casts;
+namespace Chronologue\Core\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;

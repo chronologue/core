@@ -4,12 +4,12 @@ namespace Chronologue\Core\Support;
 
 use Chronologue\Core\Support\Attributes\Transaction;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Routing\ControllerDispatcher;
+use Illuminate\Routing\ControllerDispatcher as BaseControllerDispatcher;
 use Illuminate\Routing\Route;
 use ReflectionMethod;
 use Throwable;
 
-class ControllerInvoker extends ControllerDispatcher
+class ControllerDispatcher extends BaseControllerDispatcher
 {
     /**
      * @throws Throwable

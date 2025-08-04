@@ -4,7 +4,7 @@ namespace Chronologue\Core;
 
 use Chronologue\Core\Database\Schema\Prototype;
 use Chronologue\Core\Support\Controller;
-use Chronologue\Core\Support\ControllerInvoker;
+use Chronologue\Core\Support\ControllerDispatcher;
 use Chronologue\Core\Support\ModuleServiceProvider;
 use Chronologue\Core\Support\Paginator;
 use Chronologue\Core\Support\QueryRequest;
@@ -12,7 +12,7 @@ use Chronologue\Core\Support\Service;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Routing\Contracts\ControllerDispatcher;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
 class ServiceProvider extends ModuleServiceProvider
 {
@@ -34,8 +34,8 @@ class ServiceProvider extends ModuleServiceProvider
 
     protected function registerControllerDispatcher(): void
     {
-        $this->app->singleton(ControllerDispatcher::class, function ($app) {
-            return new ControllerInvoker($app);
+        $this->app->singleton(ControllerDispatcherContract::class, function ($app) {
+            return new ControllerDispatcher($app);
         });
     }
 

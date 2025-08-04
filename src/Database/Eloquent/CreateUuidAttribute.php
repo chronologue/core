@@ -1,6 +1,6 @@
 <?php
 
-namespace Chronologue\Core\Database\Traits;
+namespace Chronologue\Core\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

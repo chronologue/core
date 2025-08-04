@@ -2,7 +2,6 @@
 
 namespace Chronologue\Core\Support;
 
-use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
@@ -19,36 +18,19 @@ abstract class ModuleServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->registering();
-
         $this->booting(function () {
-            $this->bootingBefore();
-            $this->bootRoutes();
             $this->bootMigrations();
-            $this->bootingAfter();
         });
-    }
 
-    protected function registering(): void
-    {
-        //
-    }
-
-    protected function bootingBefore(): void
-    {
-        //
-    }
-
-    protected function bootingAfter(): void
-    {
-        //
+        $this->booted(function () {
+            $this->bootRoutes();
+        });
     }
 
     protected function bootMigrations(): void
     {
         if ($this->app->runningInConsole()) {
-            $directory = str_replace('/', DIRECTORY_SEPARATOR, $this->getDirectory() . '/Database/Migrations');
-            if (is_dir($directory)) {
+            if (realpath($directory = $this->getPath($this->getMigrationPath())) !== false) {
                 $this->loadMigrationsFrom($directory);
             }
         }
@@ -56,39 +38,75 @@ abstract class ModuleServiceProvider extends ServiceProvider
 
     protected function bootRoutes(): void
     {
-        $this->bootRoutePatterns();
+        if (!$this->routesAreCached() && $this->shouldLoadRoutes()) {
+            $this->loadRoutes();
+        }
+    }
 
-        if (!($this->app instanceof CachesRoutes && $this->app->routesAreCached())) {
-            foreach ((array)config('module.routes') as $key => $value) {
-                if (file_exists($route = str_replace('/', DIRECTORY_SEPARATOR, $this->getDirectory() . '/' . $value['name']))) {
-                    Route::middleware($key)
-                        ->prefix($value['prefix'])
-                        ->group($route);
-                }
+    protected function routesAreCached(): bool
+    {
+        return $this->app->routesAreCached();
+    }
+
+    protected function shouldLoadRoutes(): bool
+    {
+        return true;
+    }
+
+    protected function loadRoutes(): void
+    {
+        $this->app->call(function () {
+            if (realpath($apiRoute = $this->getPath($this->getApiRouteFile())) !== false) {
+                Route::middleware('api')
+                    ->prefix($this->getApiRoutePrefix())
+                    ->name($this->getApiRouteName())
+                    ->group($apiRoute);
             }
-        }
+
+            if (realpath($web = $this->getPath($this->getRouteFile())) !== false) {
+                Route::middleware('web')->group($web);
+            }
+        });
     }
 
-    protected function bootRoutePatterns(): void
+    protected function getRouteFile(): string
     {
-        if ($patterns = $this->routePatterns()) {
-            Route::patterns($patterns);
-        }
+        return 'routes.php';
     }
 
-    protected function routePatterns(): array
+    protected function getApiRouteFile(): string
     {
-        return [];
+        return 'routes-api.php';
+    }
+
+    protected function getApiRoutePrefix(): string
+    {
+        return 'api';
+    }
+
+    protected function getApiRouteName(): string
+    {
+        return 'api.';
+    }
+
+    protected function getMigrationPath(): string
+    {
+        return 'Database/Migrations';
+    }
+
+    protected function getPath(string $path = ''): string
+    {
+        return $this->app->joinPaths($this->getDirectory(), $path);
+    }
+
+    protected function getDirectory(): string
+    {
+        return $this->directory;
     }
 
     protected function initDirectory(): void
     {
         $class = new ReflectionClass($this);
         $this->directory = dirname($class->getFileName());
-    }
-
-    protected function getDirectory(): string
-    {
-        return $this->directory;
     }
 }
