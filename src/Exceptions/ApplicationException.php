@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -78,6 +79,7 @@ class ApplicationException extends RuntimeException implements Responsable, Shou
         }
 
         // Default response for other exceptions
-        return response($this->getMessage(), $this->statusCode);
+        $content = app(Renderer::class)->render($request, $this);
+        return response($content, $this->statusCode)->withException($this);
     }
 }

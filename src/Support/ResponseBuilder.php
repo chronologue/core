@@ -2,6 +2,7 @@
 
 namespace Chronologue\Core\Support;
 
+use Closure;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -50,14 +51,9 @@ class ResponseBuilder
         return $this;
     }
 
-    public function breadcrumb(string|array|callable $title, ?string $url = null): static
+    public function breadcrumb(Closure $title, string $url): static
     {
-        if (is_string($title) || is_callable($title)) {
-            $this->breadcrumb[] = [$title, ($url ?: $this->request?->url()) ?: '/'];
-        } else {
-            $this->breadcrumb[] = $title;
-        }
-
+        $this->breadcrumb[] = [$title, $url];
         return $this;
     }
 
@@ -92,12 +88,9 @@ class ResponseBuilder
 
     public function build(): Responsable
     {
-        if ($request = $this->request) {
-            $this->factory->share('routing.path', fn() => Str::start($request->path(), '/'));
-            $this->factory->share('routing.params', fn() => $request->route()->parameters);
-            $this->factory->share('routing.query', fn() => $request->query());
-        }
-
+        $this->factory->share('routing.path', fn() => $this->request ? Str::start($this->request->path(), '/') : '/');
+        $this->factory->share('routing.params', fn() => $this->request ? $this->request->route()->parameters() : []);
+        $this->factory->share('routing.query', fn() => $this->request ? $this->request->query() : []);
         $this->factory->share('routing.group', fn() => $this->group);
         $this->factory->share('routing.breadcrumb', fn() => $this->resolveBreadcrumb());
         $this->factory->share('routing.tags', fn() => $this->tags);
@@ -108,22 +101,13 @@ class ResponseBuilder
 
     protected function resolveBreadcrumb(): array
     {
-        $breadcrumb = [];
-        foreach ($this->breadcrumb as $item) {
-            if (empty($item)) {
-                continue;
-            }
-            [$key, $value] = count($item) > 1 ? $item : [$item[0], null];
-            $breadcrumb[] = [is_callable($key) ? $key() : $key, $value];
-        }
-        return $breadcrumb;
+        return array_map(fn($breadcrumb) => [$breadcrumb[0](), $breadcrumb[1]], $this->breadcrumb);
     }
 
     protected function resolveTitle(): ?string
     {
         if (!$this->title && $this->breadcrumb) {
-            $title = last($this->breadcrumb)[0];
-            return is_callable($title) ? $title() : $title;
+            return last($this->breadcrumb)[0]();
         }
         return $this->title;
     }
